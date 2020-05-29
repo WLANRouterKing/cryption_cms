@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ccfcd14e-0381-491f-9eb6-ff6c18a01d24" name="alexweese" url="http://27-169-116-62.customer-virt.eu">
+        <fileTransfer rootFolder="/httpdocs/cryption_cms" accessType="FTPS" host="27-169-116-62.customer-virt.eu" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <title>{{ page.get_title() }}</title>
     <meta name="description" content="{{ page.get_meta_description() }}">
-    {% if page.get_ctrl_index() %}
+    <!--{% if page.get_ctrl_index() %}
         <meta name="robots" content="index,follow">
     {% else %}
         <meta name="robots" content="noindex,nofollow">
-    {% endif %}
+    {% endif %}-->
+    <meta name="robots" content="noindex,nofollow">
     <meta http-equiv="expires" content="3600"/>
     <meta property="og:image" content="{{ page.get_meta_image() }}">
     <meta property="og:title" content="{{ page.get_title() }}">

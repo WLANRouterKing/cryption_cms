@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import os
+from datetime import timedelta, datetime
 from flask import render_template, request, flash, redirect, url_for, escape, abort, make_response, current_app
 from validate_email import validate_email
 from werkzeug.utils import secure_filename
-from app.libs.libs import allowed_file
-from app.models import SystemMail, Session, News, Trash, SystemSettings, Encryption, Page
+from app.libs.libs import allowed_file, get_real_ip
+from app.models import SystemMail, Session, News, Trash, SystemSettings, Page
 from . import backend
 from .models import BeUser, FailedLoginRecord
 from .forms import LoginForm, EditBeUserForm, EditAccountForm, NewsEditorForm, AddBeUserForm, PageEditorForm
@@ -50,8 +51,12 @@ def login():
 
     """
     form = LoginForm()
+
+    ip_address = get_real_ip()
+    my_logger.debug(ip_address)
     if request.method == "POST":
         if form.validate_on_submit():
+            my_logger.debug("form validate on submit")
             be_user = BeUser()
             be_user.set("username", escape(request.form["username"]))
             be_user.temp_password = escape(request.form["password"])
@@ -64,15 +69,16 @@ def login():
                     session = Session()
                     session.set_user_id(be_user.get_id())
 
-                ip_address = escape(request.remote_addr)
+                ip_address = escape(ip_address)
                 user_agent = escape(request.user_agent)
                 token = session.encryption.create_random_token(32)
 
                 session.set_ip_address(ip_address)
                 session.set_user_agent(user_agent)
                 session.set_token(token)
-                session.set_timestamp(be_user.get_ctrl_last_login())
-
+                time = datetime.now()
+                session.set_timestamp(time)
+                # my_logger.log("session timestamp: {0}".format(time.strftime("d.m.Y H:i:s")))
                 if session.save() is not False:
                     session_user = be_user.create_session_user()
                     if login_user(session_user):
@@ -85,6 +91,9 @@ def login():
                 failed_login_record.set_ip_address(request.remote_addr)
                 failed_login_record.set_user_agent(str(request.user_agent))
                 failed_login_record.save()
+        else:
+            flash(form.errors)
+            my_logger.debug("form nicht valid")
     return render_template("login.html", form=form)
 
 
@@ -541,7 +550,7 @@ def delete_page(id):
 
 
 ############################################################################
-# Unauthorized Handler
+# Ajax Handler
 ############################################################################
 
 @backend.route("/ajax/image_upload", methods=["POST"])
@@ -552,23 +561,55 @@ def image_upload():
     Returns:
 
     """
+    try:
+        if "file" in request.files:
+            file = request.files["file"]
+            if file and allowed_file(file.filename):
 
-    if "file" in request.files:
-        file = request.files["file"]
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            id = escape(request.form["id"])
-            type = escape(request.form["type"])
-            module = escape(request.form["module"])
-            image_format = escape(request.form["image_format"])
-            base_upload_path = current_app.config["ROOT_DIR"] + "static/uploads/"
-            final_upload_path = base_upload_path + type + "/" + module + "/" + id + "/"
-            if not os.path.isdir(final_upload_path):
-                os.makedirs(final_upload_path)
+                filename = secure_filename(file.filename)
+                id = escape(request.form["id"])
+                type = escape(request.form["type"])
+                module = escape(request.form["module"])
+                max_files = escape(request.form["max_files"])
+                max_size = escape(request.form["max_size"])
+                image_format = escape(request.form["image_format"])
+                """
+                z.B: ein page objekt erzeugen die id setzen und laden
+                anhand von max_files prüfen ob eine liste benötigt wird
+                wenn ja bild hinzufügen. andernfalls mit image_format einfach nur dem wert im
+                dataitem setzen
+                """
 
-            file.save(os.path.join(final_upload_path, filename))
-            return filename
-    return make_response(500)
+                if module == "pages":
+                    module_object = Page()
+                    module_object.set_id(id)
+                    module_object.load()
+
+                base_path = current_app.config["ROOT_DIR"] + "app/static/"
+                final_upload_path = base_path + type + "/" + module + "/" + id + "/"
+                print(final_upload_path)
+                if not os.path.isdir(final_upload_path):
+                    os.makedirs(final_upload_path)
+
+                final_path = os.path.join(final_upload_path, filename)
+
+                if int(max_files) > 1:
+                    current_data = module_object.get_list_or_dict(image_format)
+                    if len(current_data) < max_files:
+                        module_object.add(image_format, final_path)
+                    else:
+                        return make_response(400)
+                else:
+                    module_object.set(image_format, final_path)
+
+                file.save(final_path)
+
+                module_object.save()
+
+                return filename
+        return make_response(500)
+    except Exception as error:
+        print(error)
 
 
 ############################################################################
@@ -610,13 +651,17 @@ def load_user(user_id):
         session.set_user_id(user.get_id())
         if session.load():
             session_user = user.create_session_user()
-            session_user.ip_address = request.remote_addr
+            ip_address = get_real_ip()
+            session_user.ip_address = ip_address
             session_user.user_agent = request.user_agent
             session_user.token = session.get_token()
             session_user.timestamp = session.get_timestamp()
             hash = session.get_user_hash_string(session_user)
+            my_logger.debug("session hash: {0}".format(hash))
             if session.is_valid(session.encryption.get_generic_hash(hash)):
                 return session_user
             else:
-                session.delete()
+                my_logger.debug("session nicht valid")
+                # session.delete()
+                pass
     return None

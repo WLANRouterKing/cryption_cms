@@ -1,10 +1,10 @@
-from datetime import timedelta
-from re import search
-
-from app import my_logger
-from .backend import backend
 from flask import session, flash, current_app, url_for
 from flask_wtf import FlaskForm
+from datetime import timedelta
+from re import search
+from app.libs.libs import get_url_for_abs_path
+from . import my_logger
+from .backend import backend
 from markupsafe import iteritems
 from wtforms.csrf.session import SessionCSRF
 from app.page_element_config import PAGE_ELEMENTS
@@ -24,15 +24,7 @@ class CustomForm(FlaskForm):
         self.blueprint_name = backend.name
         self.form_id = "{0}-{1}-{2}".format(self.type, self.module, "form")
         self.page = ""
-
-    class Meta:
-        csrf = True
-        csrf_class = SessionCSRF
-        csrf_time_limit = timedelta(minutes=30)
-
-        @property
-        def csrf_context(self):
-            return session
+        self.form_object = None
 
     def init_values(self, object):
         """
@@ -45,6 +37,7 @@ class CustomForm(FlaskForm):
             bool: True wenn alle Daten initialisiert werden konnten andernfalls False
 
         """
+        self.form_object = object
         elements = self.get_all_elements()
         for key in elements:
             if key == "id":
@@ -99,7 +92,10 @@ class CustomForm(FlaskForm):
     def get_image_upload_info(self, element):
         width = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["width"]
         height = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["height"]
-        return "Bilder im Format {0}x{1}".format(width, height)
+        max_images = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["max_files"]
+        max_size = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["max_size"]
+        return "Bilder im Format {0}x{1} max Anzahl: {2} max Größe: {3} MB".format(width, height, str(max_images),
+                                                                                   str(max_size))
 
     def get_document_upload_info(self, element):
         return "Dokumente"
@@ -109,13 +105,24 @@ class CustomForm(FlaskForm):
 
     def get_fileupload_container_html(self, element):
         image_format = ""
+        max_images = 0
+        max_size = 0
         if current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id] is not None:
             image_format = element.label.field_id
+            max_images = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["max_files"]
+            max_size = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["max_size"]
         html = "<div class='fileupload-container form-control'>"
-        html += '<input type="hidden" class="type" name="type" value="{0}">'.format(self.type)
-        html += '<input type="hidden" class="module" name="module" value="{0}">'.format(self.module)
         html += '<input type="hidden" class="image-format" name="image-format" value="{0}">'.format(image_format)
+        html += '<input type="hidden" class="max_files" name="max_files" value="{0}">'.format(max_images)
+        html += '<input type="hidden" class="max_size" name="max_size" value="{0}">'.format(max_size)
         html += '<span class="label">{0}</span>'.format(element.label)
+        html += '<div class="dz-preview">'
+        if max_images > 1:
+            for image_src in self.form_object.get_list_or_dict(image_format):
+                html += '<img src="' + get_url_for_abs_path(image_src) + '" alt=""/>'
+        else:
+            html += '<img src="' + get_url_for_abs_path(self.form_object.get(image_format)) + '" alt=""/>'
+        html += '</div>'
         html += "<div class='dz-message form-control'>"
         html += "<span class='upload-message'>{0}</span>".format(self.get_upload_message())
         html += "</div>"
@@ -151,16 +158,28 @@ class CustomForm(FlaskForm):
         if element_input_type is not None:
 
             if element.widget.input_type != "checkbox":
+                """
+                non checkbox form elements
+                """
                 element_classes["class"] += "form-control "
                 element_classes["class"] += "form-control-sm "
 
             if element.widget.input_type == "checkbox":
+                """
+                checkbox form element
+                """
                 html = "<div class='form-group form-check'>"
                 element_classes["class"] += "form-check-input "
             elif element.widget.input_type == "submit":
+                """
+                input type form elements
+                """
                 element_label = None
                 element_classes["class"] += "btn-dark "
             elif element.widget.input_type == "file":
+                """
+                input file type form elements
+                """
                 html += self.get_fileupload_container_html(element)
                 return html
             elif element.widget.input_type == "textarea":
@@ -168,6 +187,9 @@ class CustomForm(FlaskForm):
 
         if element_type is not None:
             if element.widget.type == "DateTimeField":
+                """
+                datetime widget
+                """
                 element_classes["class"] += "form-control "
                 element_classes["class"] += "form-control-sm "
                 element_classes["class"] += "datepicker "
@@ -175,6 +197,7 @@ class CustomForm(FlaskForm):
         element.render_kw = element_classes
 
         if element_input_type is not None:
+            my_logger.debug(element)
             if element.widget.input_type == "checkbox":
                 html += str(element)
                 if element_label is not None:
@@ -203,7 +226,12 @@ class CustomForm(FlaskForm):
         html = ""
         if form_object is not None:
             self.init_values(form_object)
-        html = '<form id="{0}" method="{1}" action="{2}">'.format(self.form_id, self.method, self.action)
+        html = '<form id="{0}" method="{1}" action="{2}" enctype="multipart/form-data">'.format(self.form_id,
+                                                                                                self.method,
+                                                                                                self.action)
+
+        html += '<input type="hidden" id="type" name="type" value="{0}">'.format(self.type)
+        html += '<input type="hidden" id="module" name="module" value="{0}">'.format(self.module)
         if self.display_tabs:
             html += "<ul class='nav nav-tabs'>"
             for tab in self.tabs:

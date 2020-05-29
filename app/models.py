@@ -1,4 +1,5 @@
 import ipaddress
+import json
 import datetime
 from re import search
 import mysql.connector
@@ -221,6 +222,7 @@ class Database:
         """
         self.encrypt = False
         self.connection = None
+        self.put_into_trash = True
         self.encryption = Encryption()
         self.item_editable = True
         self.class_label = ""
@@ -228,7 +230,6 @@ class Database:
         self.edit_node = ""
         self.delete_node = ""
         self.arrData = dict()
-        self.put_into_trash = True
         self.exclude_from_encryption = ["id", "password", "username", "user_id", "ctrl"]
         self.column_admin_rights = ["ctrl_access_level"]
         self.filter_from_form_prepare = ["csrf_token", "type", "module", "user_password", "submit", "password2",
@@ -261,7 +262,23 @@ class Database:
         Returns:
 
         """
+        if isinstance(value, list) or isinstance(value, dict):
+            value = json.dumps(value)
+
         self.arrData[key] = value
+
+    def get_list_or_dict(self, key):
+        list_or_dict = []
+        try:
+            list_or_dict = json.loads(self.get(key))
+        except Exception as error:
+            my_logger.debug(error)
+        return list_or_dict
+
+    def add(self, key, value):
+        values = self.get_list_or_dict(key)
+        values.append(value)
+        self.set(key, values)
 
     def get_id(self):
         """
@@ -946,6 +963,10 @@ class Session(Database):
                 return True
         my_logger.log(10,
                       """Session abgelaufen. User mit der ID {0} muss ausgeloggt werden.""".format(self.get_user_id()))
+        my_logger.log(10,
+                      """Difference {0} | Session-Time: {1} date-now: {2}""".format(str(difference_minute),
+                                                                                    str(session_time),
+                                                                                    str(datetime_now)))
         return False
 
 
@@ -1188,7 +1209,7 @@ class Page(Database):
         return self.get("teasertext")
 
     def get_slider_images(self):
-        return self.get("slider_images")
+        return self.get_list_or_dict("slider_images")
 
     def get_head_image(self):
         return self.get("head_image")

@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from ..forms import CustomForm
 from flask_wtf.file import FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, SelectField, DateTimeField, BooleanField, TextAreaField, \
     FileField, HiddenField
 from wtforms.validators import DataRequired, EqualTo, Length, Email
-from ..forms import CustomForm
 from ..models import Page
 
 
