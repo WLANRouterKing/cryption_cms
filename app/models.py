@@ -389,8 +389,7 @@ class Database:
             return True
         except Exception as error:
             my_logger.log(10, error)
-        finally:
-            return False
+        return False
 
     def get_as_int(self, key):
         """
