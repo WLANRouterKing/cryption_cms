@@ -2,7 +2,7 @@ import os
 from flask import current_app, request
 from flask_login import current_user
 from translations import COLUMN_LABELS
-from app import my_logger
+from app import debug_logger
 
 
 def translate_column(key):
@@ -28,7 +28,7 @@ def get_url_for_abs_path(path):
 
 
 def get_real_ip():
-    my_logger.debug("x-real-ip: {0}".format(request.headers.getlist("X-Real-IP")))
+    debug_logger.debug("x-real-ip: {0}".format(request.headers.getlist("X-Real-IP")))
     if request.headers.getlist("X-Real-IP"):
         ip = request.headers.getlist("X-Real-IP")[0]
     else:

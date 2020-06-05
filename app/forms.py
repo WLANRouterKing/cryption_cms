@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from datetime import timedelta
 from re import search
 from app.libs.libs import get_url_for_abs_path
-from . import my_logger
+from . import debug_logger
 from .backend import backend
 from markupsafe import iteritems
 from wtforms.csrf.session import SessionCSRF
@@ -197,7 +197,6 @@ class CustomForm(FlaskForm):
         element.render_kw = element_classes
 
         if element_input_type is not None:
-            my_logger.debug(element)
             if element.widget.input_type == "checkbox":
                 html += str(element)
                 if element_label is not None:

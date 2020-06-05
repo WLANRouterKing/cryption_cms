@@ -42,7 +42,6 @@ def page(page_eid):
                 return render_template("standard.html", page=page)
         elif page.get_start_page() is not None:
             start_page = page.get_start_page()
-            print(start_page.arrData)
             return render_template("start.html", page=start_page)
     return render_template('404.html', title='404'), 404
 

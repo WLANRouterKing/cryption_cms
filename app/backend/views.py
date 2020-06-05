@@ -1,18 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import importlib
 import os
-from datetime import timedelta, datetime
+from datetime import datetime
 from flask import render_template, request, flash, redirect, url_for, escape, abort, make_response, current_app
 from validate_email import validate_email
 from werkzeug.utils import secure_filename
 from app.libs.libs import allowed_file, get_real_ip
-from app.models import SystemMail, Session, News, Trash, SystemSettings, Page
+from app.models import SystemMail, Session, News, Trash, SystemSettings, Page, PageElement
 from . import backend
 from .models import BeUser, FailedLoginRecord
 from .forms import LoginForm, EditBeUserForm, EditAccountForm, NewsEditorForm, AddBeUserForm, PageEditorForm
 from flask_login import login_user, current_user, login_required, logout_user
-from app import login_manager, my_logger
+from app import login_manager, debug_logger
 from .nav import create_nav
+
+
+@backend.before_request
+def before_request_func():
+    if request.path != "/backend/login":
+        create_nav()
 
 
 ############################################################################
@@ -53,10 +60,10 @@ def login():
     form = LoginForm()
 
     ip_address = get_real_ip()
-    my_logger.debug(ip_address)
+    debug_logger.debug(ip_address)
     if request.method == "POST":
         if form.validate_on_submit():
-            my_logger.debug("form validate on submit")
+            debug_logger.debug("form validate on submit")
             be_user = BeUser()
             be_user.set("username", escape(request.form["username"]))
             be_user.temp_password = escape(request.form["password"])
@@ -82,7 +89,7 @@ def login():
                 if session.save() is not False:
                     session_user = be_user.create_session_user()
                     if login_user(session_user):
-                        my_logger.log(10, "User mit der ID {0} eingeloggt".format(session_user.get_id()))
+                        debug_logger.log(10, "User mit der ID {0} eingeloggt".format(session_user.get_id()))
                         return redirect(url_for("backend.dashboard"))
             else:
                 failed_login_record = FailedLoginRecord()
@@ -93,7 +100,7 @@ def login():
                 failed_login_record.save()
         else:
             flash(form.errors)
-            my_logger.debug("form nicht valid")
+            debug_logger.debug("form nicht valid")
     return render_template("login.html", form=form)
 
 
@@ -108,8 +115,6 @@ def dashboard():
      hauptnavigation
 
     """
-    # erstellt die navigation in bezug auf die benutzerrechte
-    create_nav()
     return render_template("dashboard.html")
 
 
@@ -550,6 +555,39 @@ def delete_page(id):
 
 
 ############################################################################
+# Pageelement
+############################################################################
+
+@backend.route("/content/page_element/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+def edit_page_element(id):
+    """
+
+    Returns:
+
+    """
+    page_element = PageElement()
+    page_element.set_id(id)
+    page_element.load()
+    eid = page_element.get("eid")
+    page_element_module = importlib.import_module("app.page_element." + eid)
+    form = page_element_module.PageElementEditorForm()
+    form.id = id
+    form.eid = eid
+    if request.method == "GET":
+        form.init_values(page_element)
+
+    if request.method == "POST":
+        if form.validate_on_submit():
+            page_element.prepare_form_input(request.form)
+            page_element.save()
+        else:
+            form.get_error_messages()
+
+    return render_template("content/page_element/edit_pageelement.html", form=form)
+
+
+############################################################################
 # Ajax Handler
 ############################################################################
 
@@ -587,7 +625,7 @@ def image_upload():
 
                 base_path = current_app.config["ROOT_DIR"] + "app/static/"
                 final_upload_path = base_path + type + "/" + module + "/" + id + "/"
-                print(final_upload_path)
+
                 if not os.path.isdir(final_upload_path):
                     os.makedirs(final_upload_path)
 
@@ -657,11 +695,11 @@ def load_user(user_id):
             session_user.token = session.get_token()
             session_user.timestamp = session.get_timestamp()
             hash = session.get_user_hash_string(session_user)
-            my_logger.debug("session hash: {0}".format(hash))
+            debug_logger.debug("session hash: {0}".format(hash))
             if session.is_valid(session.encryption.get_generic_hash(hash)):
                 return session_user
             else:
-                my_logger.debug("session nicht valid")
+                debug_logger.debug("session nicht valid")
                 # session.delete()
                 pass
     return None

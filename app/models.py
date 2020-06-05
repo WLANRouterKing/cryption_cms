@@ -16,7 +16,7 @@ from nacl.bindings import sodium_memcmp
 from flask_login import current_user
 from app import Mail
 from flask_mail import Message
-from app import my_logger
+from app import debug_logger
 from .libs.libs import translate_column
 
 
@@ -109,7 +109,7 @@ class Encryption:
             data_encrypted = box.encrypt(bytes(data, encoding="utf-8"), nonce=None, encoder=encoding.Base64Encoder)
             return data_encrypted.decode('utf-8')
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         return data
 
     @staticmethod
@@ -134,7 +134,7 @@ class Encryption:
             data_decrypted = box.decrypt(bytes(data, encoding="utf-8"), nonce=None, encoder=encoding.Base64Encoder)
             return data_decrypted.decode('utf-8')
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         return data
 
     @staticmethod
@@ -184,7 +184,7 @@ class Encryption:
             if nacl.pwhash.verify(bytes(hash_string, encoding="utf8"), bytes(string, encoding="utf8")):
                 return True
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         return False
 
     @staticmethod
@@ -272,7 +272,7 @@ class Database:
         try:
             list_or_dict = json.loads(self.get(key))
         except Exception as error:
-            my_logger.debug(error)
+            debug_logger.debug(error)
         return list_or_dict
 
     def add(self, key, value):
@@ -388,7 +388,7 @@ class Database:
             ipaddress.ip_address(value)
             return True
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         return False
 
     def get_as_int(self, key):
@@ -421,10 +421,10 @@ class Database:
                 try:
                     column.decode("utf-8")
                 except Exception as error:
-                    my_logger.log(10, error)
+                    debug_logger.log(10, error)
                 columns.append(column)
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
         return columns
@@ -468,7 +468,9 @@ class Database:
         return False
 
     def prepare_form_input(self, form_request):
+        print(form_request)
         for key in form_request:
+            print(key)
             if key not in self.filter_from_form_prepare:
                 data = str(form_request[key])
                 self.set(key, data)
@@ -508,11 +510,11 @@ class Database:
                         if isinstance(self.get(key), bytearray):
                             self.set(key, self.get(key).decode('utf-8'))
                     except Exception as error:
-                        my_logger.log(10, error)
+                        debug_logger.log(10, error)
                 self.decrypt_data()
                 return True
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
 
@@ -542,7 +544,7 @@ class Database:
                     if isinstance(data[key], bytearray):
                         data[key] = data[key].decode('utf-8')
                 except Exception as error:
-                    my_logger.log(10, error)
+                    debug_logger.log(10, error)
             update_string = ""
             columns = data.keys()
             max_keys = len(data.keys())
@@ -571,7 +573,7 @@ class Database:
                                                                                        self.table_name), "success")
 
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.debug(error)
             success = False
         finally:
             self.close_connection(cursor)
@@ -616,7 +618,7 @@ class Database:
                       "success")
 
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
 
@@ -667,7 +669,7 @@ class Database:
                 if row > 0:
                     success = True
             except Exception as error:
-                my_logger.log(10, error)
+                debug_logger.log(10, error)
             finally:
                 self.close_connection(cursor)
 
@@ -704,7 +706,7 @@ class Database:
                 if row[0]:
                     self.list.append(row[0])
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
         return self.list
@@ -733,7 +735,7 @@ class Database:
             for row in rows:
                 id_label_list.append(row)
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
         return id_label_list
@@ -852,7 +854,7 @@ class Database:
             cursor.execute(sql, [value])
             rows = cursor.fetchone()
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
         if rows is not None:
@@ -873,7 +875,7 @@ class Database:
             cursor.execute(sql, [name])
             rows = cursor.fetchone()
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
         if rows is not None:
@@ -955,17 +957,18 @@ class Session(Database):
             difference = datetime_now.timestamp() - session_time.timestamp()
             difference_minute = difference / 60
         if difference_minute <= 30:
-            my_logger.log(10, """Session mit der User ID {0} ist noch nicht abgelaufen""".format(self.get_user_id()))
+            debug_logger.log(10, """Session mit der User ID {0} ist noch nicht abgelaufen""".format(self.get_user_id()))
             hash_session = self.encryption.get_generic_hash(self.get_session_hash_string())
             if sodium_memcmp(hash_session, user_hash):
-                my_logger.log(10, """Session mit der User ID {0} ist valid""".format(self.get_user_id()))
+                debug_logger.log(10, """Session mit der User ID {0} ist valid""".format(self.get_user_id()))
                 return True
-        my_logger.log(10,
-                      """Session abgelaufen. User mit der ID {0} muss ausgeloggt werden.""".format(self.get_user_id()))
-        my_logger.log(10,
-                      """Difference {0} | Session-Time: {1} date-now: {2}""".format(str(difference_minute),
-                                                                                    str(session_time),
-                                                                                    str(datetime_now)))
+        debug_logger.log(10,
+                         """Session abgelaufen. User mit der ID {0} muss ausgeloggt werden.""".format(
+                             self.get_user_id()))
+        debug_logger.log(10,
+                         """Difference {0} | Session-Time: {1} date-now: {2}""".format(str(difference_minute),
+                                                                                       str(session_time),
+                                                                                       str(datetime_now)))
         return False
 
 
@@ -1064,7 +1067,7 @@ class SystemMail(Database):
             mail.send(message)
             self.save()
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
 
         return False
 
@@ -1101,7 +1104,7 @@ class Trash(Database):
             connection.commit()
             row = cursor.lastrowid
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
         if row > 0:
@@ -1120,7 +1123,7 @@ class Trash(Database):
             connection.commit()
             row = cursor.lastrowid
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
         if row > 0:
@@ -1354,7 +1357,7 @@ class Page(Database):
                 page.set_id(row[0])
                 page.load()
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
         return page
@@ -1389,7 +1392,7 @@ class Page(Database):
             for row in rows:
                 id_label_list.append(row)
         except Exception as error:
-            my_logger.log(10, error)
+            debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
         return id_label_list
@@ -1414,7 +1417,7 @@ class Page(Database):
                 for row in cursor:
                     result.append(row)
             except Exception as error:
-                my_logger.log(10, error)
+                debug_logger.log(10, error)
             finally:
                 self.close_connection(cursor)
         return result
@@ -1441,7 +1444,7 @@ class Page(Database):
                     if len(rows) > 0:
                         return True
                 except Exception as error:
-                    my_logger.log(10, error)
+                    debug_logger.log(10, error)
                 finally:
                     self.close_connection(cursor)
             return False
@@ -1500,3 +1503,13 @@ class Page(Database):
             html += '</li>'
         html += '</ul>'
         return html
+
+
+class PageElement(Database):
+
+    def __init__(self):
+        super().__init__()
+        self.table_name = "page_element"
+        self.class_label = "Seitenelement"
+        self.edit_node = "edit_" + self.table_name
+        self.delete_node = "delete_" + self.table_name
