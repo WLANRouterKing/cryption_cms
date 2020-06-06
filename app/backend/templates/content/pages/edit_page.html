@@ -6,6 +6,11 @@
             {{ form_helper.render_form(form) }}
         {% endif %}
     </div>
+    <div class="col-lg-4">
+        {% if form %}
+            {{ form_helper.render_form(form) }}
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block footer_script_end %}

@@ -25,9 +25,6 @@ $(document).ready(function () {
                     ]
                 }
             })
-            .then(editor => {
-                console.log(editor);
-            })
             .catch(error => {
                 console.error(error);
             });
@@ -93,12 +90,10 @@ $(document).ready(function () {
         },
         error: function (error) {
             $(this).children(".type");
-            console.log(error);
             $(".dz-success-mark").hide();
             $(".dz-error-mark").show();
         },
         success: function () {
-            console.log("success");
             $(".dz-success-mark").show();
             $(".dz-error-mark").hide();
             $.each($(this.element).children('.dz-preview'), function (index, object) {

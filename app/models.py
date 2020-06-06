@@ -1457,7 +1457,7 @@ class Page(Database):
                     debug_logger.log(10, error)
                 finally:
                     self.close_connection(cursor)
-            return False
+        return False
 
     def get_page_tree(self):
         """
@@ -1525,7 +1525,6 @@ class PageElement(Database):
         self.class_label = "Seitenelement"
         self.edit_node = "edit_" + self.table_name
         self.delete_node = "delete_" + self.table_name
-
         self.content = self.get("content")
 
     def add_content(self, key, value):
@@ -1566,3 +1565,30 @@ class PageElement(Database):
         self.content = json.loads(self.get("content"))
         for key in self.content:
             self.set(key, self.content[key])
+
+    def get_list_for_page(self, id):
+        connection = self.get_connection()
+        cursor = connection.cursor(prepared=True)
+        list = list()
+        list_page_elements = list()
+        try:
+            table = self.table_name
+            sql = """SELECT id FROM {0} WHERE page_id = %s""".format(table)
+            if self.put_into_trash:
+                sql += " AND ctrl_deleted = 0 "
+            sql += " ORDER BY ctrl_position ASC "
+            cursor.execute(sql, [int(id)])
+            rows = cursor.fetchall()
+            for row in rows:
+                if row[0]:
+                    list.append(row[0])
+        except Exception as error:
+            debug_logger.log(10, error)
+        finally:
+            self.close_connection(cursor)
+        for id in list:
+            page_element = PageElement()
+            page_element.set_id(id)
+            page_element.load()
+            list_page_elements.append(page_element)
+        return list_page_elements

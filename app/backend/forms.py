@@ -172,3 +172,6 @@ class PageElementEditorBaseForm(CustomForm):
         self.module = "page_element"
         page = Page()
         self.page_id.choices = page.get_id_label_list()
+
+    def get_dom_id(self):
+        return "page_element-{0}".format(self.id.data)

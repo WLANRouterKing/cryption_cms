@@ -517,11 +517,14 @@ def edit_page(id):
     form = PageEditorForm()
     form.id = id
     page = Page()
+    page_element = PageElement()
     form.parent_id.choices = page.get_id_label_list()
+    page_elements = list()
 
     if id > 0:
         page.set_id(id)
         page.load()
+        page_elements = page_element.get_list_for_page(page.get_id())
 
     if request.method == "GET":
         form.init_values(page)
@@ -532,7 +535,8 @@ def edit_page(id):
             page.save()
         else:
             form.get_error_messages()
-    return render_template("content/pages/edit_page.html", form=form)
+
+    return render_template("content/pages/edit_page.html", form=form, page_elements=page_elements)
 
 
 @backend.route("/content/pages/delete_page/<int:id>", methods=["GET"])
@@ -571,11 +575,10 @@ def edit_page_element(id):
     if id > 0:
         page_element.set_id(id)
         page_element.load()
-        print("load")
 
     eid = page_element.get("eid")
     page_element_module = importlib.import_module("app.page_element." + eid)
-    form = page_element_module.PageElementEditorForm()
+    form = page_element_module.page_element_editor_form
     form.id = id
     form.eid = eid
     if request.method == "GET":
