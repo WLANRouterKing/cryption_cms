@@ -8,6 +8,9 @@ from .backend import backend
 from markupsafe import iteritems
 from wtforms.csrf.session import SessionCSRF
 from app.page_element_config import PAGE_ELEMENTS
+import json
+
+from .models import PageElement
 
 
 class CustomForm(FlaskForm):
@@ -43,8 +46,9 @@ class CustomForm(FlaskForm):
             if key == "id":
                 self.id = int(object.get(key))
             element = elements[key]
-            element.data = object.get(key)
-
+            value = object.get(key)
+            element.data = value
+            
     @property
     def action(self):
         page = "{0}.{1}".format(self.blueprint_name, self.page)
@@ -80,7 +84,7 @@ class CustomForm(FlaskForm):
         return False
 
     def is_element_control(self, element_id):
-        if search("ctrl", element_id) is not None:
+        if search("ctrl", element_id) is not None or search("page_id", element_id) is not None:
             return True
         return False
 

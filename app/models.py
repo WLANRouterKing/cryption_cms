@@ -234,6 +234,10 @@ class Database:
         self.column_admin_rights = ["ctrl_access_level"]
         self.filter_from_form_prepare = ["csrf_token", "type", "module", "user_password", "submit", "password2",
                                          "image-format"]
+        self.exclude_from_page_element_content = ["id", "eid", "ctrl_deleted", "ctrl_position", "csrf_token", "submit",
+                                                  "module",
+                                                  "type",
+                                                  "page_id", "ctrl_hidden"]
 
     def get(self, key):
         """
@@ -418,10 +422,6 @@ class Database:
             rows = cursor.fetchall()
             for d in rows:
                 column = d[0]
-                try:
-                    column.decode("utf-8")
-                except Exception as error:
-                    debug_logger.log(10, error)
                 columns.append(column)
         except Exception as error:
             debug_logger.log(10, error)
@@ -468,9 +468,15 @@ class Database:
         return False
 
     def prepare_form_input(self, form_request):
-        print(form_request)
+        """
+
+        Args:
+            form_request ():
+
+        Returns:
+
+        """
         for key in form_request:
-            print(key)
             if key not in self.filter_from_form_prepare:
                 data = str(form_request[key])
                 self.set(key, data)
@@ -532,6 +538,7 @@ class Database:
             bool: True wenn das Update erfolgreich ausgeführt wurde andernfalls False
 
         """
+        columns = self.get_columns()
         connection = self.get_connection()
         cursor = connection.cursor(prepared=True)
         success = False
@@ -546,8 +553,7 @@ class Database:
                 except Exception as error:
                     debug_logger.log(10, error)
             update_string = ""
-            columns = data.keys()
-            max_keys = len(data.keys())
+            max_keys = len(columns)
             i = 1
             for column in columns:
                 update_string += column
@@ -556,12 +562,17 @@ class Database:
                 if i < max_keys:
                     update_string += ", "
                 i += 1
-            data["last_id"] = id
-            values = list(data.values())
+            values = list()
+            for key in columns:
+                values.append(self.get(key))
+            values.append(id)
+            print(values)
             sql = """UPDATE {0} SET {1} WHERE id = %s """.format(table, update_string)
+            print(sql)
             cursor.execute(sql, values)
-            rowcount = cursor.rowcount
             connection.commit()
+            rowcount = cursor.rowcount
+
             if rowcount > 0:
                 success = True
 
@@ -571,7 +582,6 @@ class Database:
             elif rowcount <= 0 and self.item_editable:
                 flash("{0} mit der ID {1} konnte nicht aktualisiert werden {2}".format(self.class_label, self.get_id(),
                                                                                        self.table_name), "success")
-
         except Exception as error:
             debug_logger.debug(error)
             success = False
@@ -1506,10 +1516,53 @@ class Page(Database):
 
 
 class PageElement(Database):
+    content = dict()
 
     def __init__(self):
         super().__init__()
+        self.arrData["content"] = dict()
         self.table_name = "page_element"
         self.class_label = "Seitenelement"
         self.edit_node = "edit_" + self.table_name
         self.delete_node = "delete_" + self.table_name
+
+        self.content = self.get("content")
+
+    def add_content(self, key, value):
+        """
+
+        Args:
+            key ():
+            value ():
+
+        Returns:
+
+        """
+        self.content[key] = value
+
+    def get_content(self, key):
+        return self.content[key]
+
+    def prepare_form_input(self, form_request):
+        for key in form_request:
+            if key not in self.exclude_from_page_element_content:
+                data = str(form_request[key])
+                self.add_content(key, data)
+            else:
+                if key not in self.filter_from_form_prepare:
+                    if key == "page_id":
+                        id = int(form_request[key])
+                        if id <= 0:
+                            continue
+                    data = str(form_request[key])
+                    self.set(key, data)
+
+    def save(self):
+        self.set("content", self.content)
+        super(PageElement, self).save()
+
+    def load(self):
+        super(PageElement, self).load()
+        self.content = json.loads(self.get("content"))
+        for key in self.content:
+            self.set(key, self.content[key])

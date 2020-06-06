@@ -32,6 +32,7 @@ class SessionUser(UserMixin):
     token = ""
 
     def __init__(self):
+        super().__init__()
         self.user_agent = ""
         self.ip_address = ""
         self.token = ""

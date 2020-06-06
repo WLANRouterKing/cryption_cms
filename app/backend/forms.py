@@ -157,3 +157,18 @@ class PageEditorForm(CustomForm):
         self.module = "pages"
         page = Page()
         self.parent_id.choices = page.get_id_label_list()
+
+
+class PageElementEditorBaseForm(CustomForm):
+    page_id = SelectField("Verschieben auf Seite", coerce=int)
+    id = HiddenField()
+    eid = HiddenField()
+    submit = SubmitField("Seitenelement speichern")
+
+    def __init__(self):
+        super().__init__()
+        self.type = "content"
+        self.page = "edit_page_element"
+        self.module = "page_element"
+        page = Page()
+        self.page_id.choices = page.get_id_label_list()

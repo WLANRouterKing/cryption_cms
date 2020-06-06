@@ -92,6 +92,14 @@
 
 <div id="status-bar">
     {% block status_bar %}
+        <div class="container-fluid">
+            {% if current_user %}
+                {% if current_user.is_authenticated %}
+                    <span>Eingeloggt als {{ current_user.username }}</span>
+                    <span>Letzter Login {{ current_user.last_login }}</span>
+                {% endif %}
+            {% endif %}
+        </div>
     {% endblock %}
 </div>
 
@@ -109,6 +117,10 @@
 
 <div id="content">
     {% block content %}
+        <div class="container-fluid">
+            {% block editor %}
+            {% endblock %}
+        </div>
     {% endblock %}
 </div>
 

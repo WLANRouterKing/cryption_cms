@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 from app.libs.libs import allowed_file, get_real_ip
 from app.models import SystemMail, Session, News, Trash, SystemSettings, Page, PageElement
 from . import backend
-from .models import BeUser, FailedLoginRecord
+from .models import BeUser, FailedLoginRecord, SessionUser
 from .forms import LoginForm, EditBeUserForm, EditAccountForm, NewsEditorForm, AddBeUserForm, PageEditorForm
 from flask_login import login_user, current_user, login_required, logout_user
 from app import login_manager, debug_logger
@@ -18,7 +18,7 @@ from .nav import create_nav
 
 @backend.before_request
 def before_request_func():
-    if request.path != "/backend/login":
+    if request.path != "/backend/login" and current_user.is_authenticated:
         create_nav()
 
 
@@ -100,7 +100,6 @@ def login():
                 failed_login_record.save()
         else:
             flash(form.errors)
-            debug_logger.debug("form nicht valid")
     return render_template("login.html", form=form)
 
 
@@ -566,9 +565,14 @@ def edit_page_element(id):
     Returns:
 
     """
+
     page_element = PageElement()
-    page_element.set_id(id)
-    page_element.load()
+
+    if id > 0:
+        page_element.set_id(id)
+        page_element.load()
+        print("load")
+
     eid = page_element.get("eid")
     page_element_module = importlib.import_module("app.page_element." + eid)
     form = page_element_module.PageElementEditorForm()
@@ -700,6 +704,5 @@ def load_user(user_id):
                 return session_user
             else:
                 debug_logger.debug("session nicht valid")
-                # session.delete()
-                pass
-    return None
+                session.delete()
+    return SessionUser()

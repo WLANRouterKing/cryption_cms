@@ -1,15 +1,11 @@
-from wtforms import HiddenField, StringField, SelectField, TextField, FieldList, SubmitField
+from wtforms import StringField
 
-from app.backend.forms import Texteditor
-from app.forms import CustomForm
+from app.backend.forms import Texteditor, PageElementEditorBaseForm
 
 
-class PageElementEditorForm(CustomForm):
-    id = HiddenField()
-    eid = HiddenField()
+class PageElementEditorForm(PageElementEditorBaseForm):
     headline = StringField("Überschrift")
     text = Texteditor("Text")
-    submit = SubmitField("News Meldung speichern")
 
     def __init__(self):
         super().__init__()
