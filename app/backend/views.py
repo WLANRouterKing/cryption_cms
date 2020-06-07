@@ -3,7 +3,7 @@
 import importlib
 import os
 from datetime import datetime
-from flask import render_template, request, flash, redirect, url_for, escape, abort, make_response, current_app
+from flask import render_template, request, flash, redirect, url_for, escape, abort, make_response, current_app, json
 from validate_email import validate_email
 from werkzeug.utils import secure_filename
 from app.libs.libs import allowed_file, get_real_ip
@@ -655,6 +655,36 @@ def image_upload():
         return make_response(500)
     except Exception as error:
         print(error)
+
+
+@backend.route("/ajax/page_element_create", methods=["POST"])
+@login_required
+def page_element_create():
+    dict_json = dict()
+    eid = request.form.get("eid")
+    page_id = request.form.get("page_id")
+
+    if eid is not None and int(page_id) > 0:
+        page_element_module = None
+        try:
+            page_element_module = importlib.import_module("app.page_element." + eid)
+        except Exception as error:
+            debug_logger.debug(error)
+            abort(403)
+        page_element = PageElement()
+        page_element.init_default()
+        page_element.set_eid(eid)
+        page_element.set("page_id", page_id)
+        page_element.init_ctrl_position()
+        dict_json["success"] = False
+
+        if page_element.save():
+            if page_element_module is not None:
+                dict_json["success"] = True
+                dict_json["id"] = page_element.get_id()
+                dict_json["html"] = page_element.get_preview_html(page_element_module.page_element_config)
+
+        return make_response(json.jsonify(dict_json))
 
 
 ############################################################################

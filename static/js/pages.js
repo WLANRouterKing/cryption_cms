@@ -1,5 +1,15 @@
 $(document).ready(function () {
 
+    var csrftoken = document.getElementById("csrf_token").value;
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken)
+            }
+        }
+    })
+
     var page_elements_dialog = $("#page-element-overview-dialog").dialog({
         buttons: [
             {
@@ -31,7 +41,25 @@ $(document).ready(function () {
     });
 
     $('.page-element-item').bind("click touch", function () {
-        $('#page-elements').append('<div class="page-element-content-item"><div class="head"><span class="title">' + $(this).attr("eid") + '</span><span class="edit"></span></div></div>');
+
+        $.ajax({
+            url: "/backend/ajax/page_element_create",
+            method: "POST",
+            credentials: true,
+            data: {eid: $(this).attr("eid"), page_id: $('#id').val()},
+            success: function (response) {
+                console.log(response);
+                if (response.success === true) {
+                    $('#page-elements').append(response.html);
+                } else {
+                    alert("Seitenelement konnte nicht erstellt werden");
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+
     });
 
 });

@@ -18,6 +18,7 @@ from app import Mail
 from flask_mail import Message
 from app import debug_logger
 from .libs.libs import translate_column
+from .page_element_config import PAGE_ELEMENTS
 
 
 class Encryption:
@@ -480,6 +481,33 @@ class Database:
             if key not in self.filter_from_form_prepare:
                 data = str(form_request[key])
                 self.set(key, data)
+
+    def get_list_for_page(self, id):
+        connection = self.get_connection()
+        cursor = connection.cursor(prepared=True)
+        id_list = list()
+        list_page_elements = list()
+        try:
+            table = self.table_name
+            sql = """SELECT id FROM {0} WHERE page_id = %s""".format(table)
+            if self.put_into_trash:
+                sql += " AND ctrl_deleted = 0 "
+            sql += " ORDER BY ctrl_position ASC "
+            cursor.execute(sql, [int(id)])
+            rows = cursor.fetchall()
+            for row in rows:
+                if row[0]:
+                    list.append(row[0])
+        except Exception as error:
+            debug_logger.log(10, error)
+        finally:
+            self.close_connection(cursor)
+        for id in id_list:
+            page_element = PageElement()
+            page_element.set_id(id)
+            page_element.load()
+            list_page_elements.append(page_element)
+        return list_page_elements
 
     def load(self):
         """
@@ -1527,6 +1555,11 @@ class PageElement(Database):
         self.delete_node = "delete_" + self.table_name
         self.content = self.get("content")
 
+    def get_page_id(self):
+        if "page_id" in self.arrData:
+            return int(self.get("page_id"))
+        return 0
+
     def add_content(self, key, value):
         """
 
@@ -1540,7 +1573,16 @@ class PageElement(Database):
         self.content[key] = value
 
     def get_content(self, key):
-        return self.content[key]
+        if key in self.content:
+            return self.content[key]
+        return ""
+
+    def init_ctrl_position(self):
+        if self.get_page_id() > 0:
+            max_index = self.get_max_index_for_page()
+            self.set("ctrl_position", max_index + 1)
+            return True
+        return False
 
     def prepare_form_input(self, form_request):
         for key in form_request:
@@ -1558,7 +1600,7 @@ class PageElement(Database):
 
     def save(self):
         self.set("content", self.content)
-        super(PageElement, self).save()
+        return super(PageElement, self).save()
 
     def load(self):
         super(PageElement, self).load()
@@ -1566,29 +1608,48 @@ class PageElement(Database):
         for key in self.content:
             self.set(key, self.content[key])
 
-    def get_list_for_page(self, id):
+    def get_preview_html(self, page_element_config):
+        html = ""
+        css_class_hidden = ""
+        if self.get("ctrl_hidden"):
+            css_class_hidden = "hidden"
+        html += '<div id="page-element-' + str(
+            self.get_id()) + '" class="' + self.get_eid() + " " + css_class_hidden + '" data-position="' + str(self.get(
+            "ctrl_position")) + '">'
+
+        html += '<div class="page-element-header">'
+        html += '<span class="title">' + PAGE_ELEMENTS[str(self.get_eid())]["label"] + '</span>'
+        html += '<div class="controls">'
+        html += '<span class="edit-page-element"></span>'
+        if current_user.is_admin or current_user.is_moderator:
+            html += '<span class="hide-page-element"></span>'
+        if current_user.is_admin or current_user.is_moderator:
+            html += '<span class="delete-page-element"></span>'
+        html += '</div>'
+        html += '</div>'
+
+        for field in page_element_config:
+            html += '<p class="page-element-content page-element-content-' + field + '">'
+            html += '<span class="label">' + page_element_config[field][0] + '</span></br>'
+            html += '<span class="value">' + self.get_content(field) + '</span></br>'
+            html += '</p>'
+        html += '</div>'
+        return html
+
+    def get_max_index_for_page(self):
+        id = self.get_page_id()
         connection = self.get_connection()
         cursor = connection.cursor(prepared=True)
-        list = list()
-        list_page_elements = list()
+        index = None
         try:
             table = self.table_name
-            sql = """SELECT id FROM {0} WHERE page_id = %s""".format(table)
-            if self.put_into_trash:
-                sql += " AND ctrl_deleted = 0 "
-            sql += " ORDER BY ctrl_position ASC "
+            sql = """SELECT MAX(ctrl_position) FROM {0} WHERE page_id = %s""".format(table)
             cursor.execute(sql, [int(id)])
             rows = cursor.fetchall()
             for row in rows:
-                if row[0]:
-                    list.append(row[0])
+                index = row[0]
         except Exception as error:
             debug_logger.log(10, error)
         finally:
             self.close_connection(cursor)
-        for id in list:
-            page_element = PageElement()
-            page_element.set_id(id)
-            page_element.load()
-            list_page_elements.append(page_element)
-        return list_page_elements
+        return index
