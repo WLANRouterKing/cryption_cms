@@ -96,10 +96,6 @@ $(document).ready(function () {
         success: function () {
             $(".dz-success-mark").show();
             $(".dz-error-mark").hide();
-            $.each($(this.element).children('.dz-preview'), function (index, object) {
-                console.log(object);
-                console.log(index);
-            });
         }
     });
 
@@ -107,7 +103,6 @@ $(document).ready(function () {
 
     $('.nav-tabs .nav-link').bind("click touch", function () {
         let tab_id = "#tab-" + $(this).attr('data-tab-id');
-        console.log(tab_id)
         $('.tab').hide();
         $(tab_id).show();
     });

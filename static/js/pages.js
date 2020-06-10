@@ -48,7 +48,6 @@ $(document).ready(function () {
             credentials: true,
             data: {eid: $(this).attr("eid"), page_id: $('#id').val()},
             success: function (response) {
-                console.log(response);
                 if (response.success === true) {
                     $('#page-elements').append(response.html);
                 } else {
@@ -56,7 +55,7 @@ $(document).ready(function () {
                 }
             },
             error: function (error) {
-                console.log(error);
+                alert(error);
             }
         });
 

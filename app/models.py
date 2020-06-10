@@ -1544,6 +1544,9 @@ class Page(Database):
 
 
 class PageElement(Database):
+    """
+
+    """
     content = dict()
 
     def __init__(self):
@@ -1609,6 +1612,16 @@ class PageElement(Database):
             self.set(key, self.content[key])
 
     def get_preview_html(self, page_element_config):
+        """
+
+        returns the html for the edit section of the pages
+
+        Args:
+            page_element_config (): dict()
+
+        Returns:
+
+        """
         html = ""
         css_class_hidden = ""
         if self.get("ctrl_hidden"):
@@ -1617,6 +1630,9 @@ class PageElement(Database):
             self.get_id()) + '" class="' + self.get_eid() + " " + css_class_hidden + '" data-position="' + str(self.get(
             "ctrl_position")) + '">'
 
+        """
+            add the pageelements
+        """
         html += '<div class="page-element-header">'
         html += '<span class="title">' + PAGE_ELEMENTS[str(self.get_eid())]["label"] + '</span>'
         html += '<div class="controls">'
@@ -1637,6 +1653,13 @@ class PageElement(Database):
         return html
 
     def get_max_index_for_page(self):
+        """
+        returns the max index for the current pageelement which is not created yet.
+        the index get calculated by SQL MAX() function of ctrl_position so the new index needs to be raised by one (+1)
+
+        Returns:
+
+        """
         id = self.get_page_id()
         connection = self.get_connection()
         cursor = connection.cursor(prepared=True)
