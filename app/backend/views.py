@@ -60,10 +60,9 @@ def login():
     form = LoginForm()
 
     ip_address = get_real_ip()
-    debug_logger.debug(ip_address)
+
     if request.method == "POST":
         if form.validate_on_submit():
-            debug_logger.debug("form validate on submit")
             be_user = BeUser()
             be_user.set("username", escape(request.form["username"]))
             be_user.temp_password = escape(request.form["password"])
@@ -85,7 +84,7 @@ def login():
                 session.set_token(token)
                 time = datetime.now()
                 session.set_timestamp(time)
-                # my_logger.log("session timestamp: {0}".format(time.strftime("d.m.Y H:i:s")))
+
                 if session.save() is not False:
                     session_user = be_user.create_session_user()
                     if login_user(session_user):
