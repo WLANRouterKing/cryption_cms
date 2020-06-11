@@ -7,7 +7,8 @@ from flask import render_template, request, flash, redirect, url_for, escape, ab
 from validate_email import validate_email
 from werkzeug.utils import secure_filename
 from app.libs.libs import allowed_file, get_real_ip
-from app.models import SystemMail, Session, News, Trash, SystemSettings, Page, PageElement
+from app.models import SystemMail, Session, Trash, SystemSettings, Page, PageElement
+from app.modules import News
 from . import backend
 from .models import BeUser, FailedLoginRecord, SessionUser
 from .forms import LoginForm, EditBeUserForm, EditAccountForm, NewsEditorForm, AddBeUserForm, PageEditorForm
@@ -731,7 +732,7 @@ def load_user(user_id):
             session_user.token = session.get_token()
             session_user.timestamp = session.get_timestamp()
             hash = session.get_user_hash_string(session_user)
-            debug_logger.debug("session hash: {0}".format(hash))
+
             if session.is_valid(session.encryption.get_generic_hash(hash)):
                 return session_user
             else:

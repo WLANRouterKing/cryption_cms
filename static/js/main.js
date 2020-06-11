@@ -4,13 +4,6 @@
 $(document).ready(function () {
 
     /**
-     * Bootstrap Dropdown
-     */
-    $(".dropdown-toggle").dropdown({
-        flip: true
-    });
-
-    /**
      * CKEditor initialisieren
      */
     $.each(document.getElementsByClassName('texteditor'), function (index, object) {

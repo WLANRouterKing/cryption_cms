@@ -5,7 +5,7 @@ COLUMN_LABELS = {
     "id": {"DE": "Id", "EN": "Id"},
     "username": {"DE": "Benutzername", "EN": "Username"},
     "password": {"DE": "Passwort", "EN": "Password"},
-    "email": {"DE": "Benutzername", "EN": "E-Mail"},
+    "email": {"DE": "E-Mail", "EN": "E-Mail"},
     "ctrl_access_level": {"DE": "Benutzergruppe", "EN": "Usergroup"},
     "ctrl_last_login": {"DE": "Letzter Login", "EN": "Last Login"},
     "ctrl_active": {"DE": "Aktiv", "EN": "Active"},
@@ -27,4 +27,9 @@ COLUMN_LABELS = {
     "main_image": {"DE": "Hauptbild", "EN": "Main Image"},
     "teaser_image": {"DE": "Teaser Bild", "EN": "Teaser Image"},
     "news_images": {"DE": "Bilder", "EN": "Images"},
+    "timestamp": {"DE": "Zeitpunkt", "EN": "Time"},
+    "ip_address": {"DE": "IP-Adresse", "EN": "IP Address"},
+    "user_agent": {"DE": "User Agent", "EN": "User Agent"},
+    "item_id": {"DE": "Item ID", "EN": "Item ID"},
+    "item_table": {"DE": "Tabelle", "EN": "Table"},
 }
