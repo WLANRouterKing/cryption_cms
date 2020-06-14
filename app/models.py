@@ -790,7 +790,7 @@ class Database:
     def get_list_html(self):
         object = self
         columns = self.get_columns()
-        html = '<table class="table table-striped table-dark col-lg-12 ">'
+        html = '<table cellspacing="0" class="table table-striped table-dark col-lg-12 ">'
         html += '<thead>'
         for column in columns:
             if not search('ctrl_', column):
@@ -801,7 +801,7 @@ class Database:
 
             for key in item.arrData:
                 if key == 'id' or search('_id', key):
-                    html += '<th scope="row">' + str(item.get(key)) + '</th>'
+                    html += '<td scope="row">' + str(item.get(key)) + '</th>'
                 else:
                     if not search('ctrl_', key):
                         html += '<td>' + str(item.get(key)) + '</td>'

@@ -98,7 +98,7 @@ class CustomForm(FlaskForm):
         height = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["height"]
         max_images = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["max_files"]
         max_size = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["max_size"]
-        return "Bilder im Format {0}x{1} max Anzahl: {2} max Größe: {3} MB".format(width, height, str(max_images),
+        return "Bilder im Format {0}x{1} | max. Anzahl: {2} | max. Größe: {3} MB".format(width, height, str(max_images),
                                                                                    str(max_size))
 
     def get_document_upload_info(self, element):
@@ -229,7 +229,7 @@ class CustomForm(FlaskForm):
         html = ""
         if form_object is not None:
             self.init_values(form_object)
-        html = '<form id="{0}" method="{1}" action="{2}" enctype="multipart/form-data">'.format(self.form_id,
+        html = '<form id="{0}" method="{1}" cellspacing="0" action="{2}" enctype="multipart/form-data">'.format(self.form_id,
                                                                                                 self.method,
                                                                                                 self.action)
 

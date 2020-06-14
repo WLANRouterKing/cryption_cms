@@ -21,14 +21,12 @@ def allowed_file(filename):
 
 def get_url_for_abs_path(path):
     splitted = str(path).split("/app")
-    print(splitted)
     if len(splitted) > 1:
         return splitted[1]
     return ""
 
 
 def get_real_ip():
-    debug_logger.debug("x-real-ip: {0}".format(request.headers.getlist("X-Real-IP")))
     if request.headers.getlist("X-Real-IP"):
         ip = request.headers.getlist("X-Real-IP")[0]
     else:

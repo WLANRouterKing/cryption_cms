@@ -13,6 +13,7 @@ body {
     height: auto;
     max-width: 100%;
     margin: 0 auto;
+    overflow: hidden;
 }
 
 ul {
@@ -45,23 +46,59 @@ p, span, a {
     font-weight: 400;
 }
 
-table {
+label {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+input {
+    position: relative;
+    height: auto;
+    overflow: hidden;
+    width: 100%;
+    max-width: 300px;
+}
+
+input[type="submit"] {
+    cursor: pointer;
+    background: #212529;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px;
     width: 100%;
 }
+
+table {
+    width: 100%;
+    background: #212529;
+}
+
 
 td,
 th {
     width: auto;
     height: auto;
     overflow: hidden;
-    padding: 2px;
+    padding: 4px;
     text-align: left;
     color: #212529;
+    height: 35px;
 }
 
 td.edit,
 td.remove {
     cursor: pointer;
+}
+
+td {
+    background: #ccc;
+}
+
+th {
+    color: #fff;
+    background: #212529;
 }
 
 .clear {
@@ -108,16 +145,17 @@ td.remove {
 
 #content {
     max-width: calc(100% - 220px);
-    height: auto;
-    overflow: hidden;
+    height: 100vh;
     padding-top: 50px;
     float: left;
-    overflow-y: scroll;
+    overflow: hidden;
     padding-left: 50px;
+    overflow-y: scroll;
 }
 
 #content .col-lg-4 {
     position: absolute;
+    z-index: 99999;
 }
 
 #submit {
@@ -148,6 +186,10 @@ td.remove {
 
 .form-inline label {
     margin-left: 15px;
+}
+
+.form-group {
+    margin-bottom: 10px;
 }
 
 .fileupload-container {
