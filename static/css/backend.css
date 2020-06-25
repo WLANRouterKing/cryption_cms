@@ -154,7 +154,7 @@ th {
 }
 
 #content .col-lg-4 {
-    position: absolute;
+    position: relative;
     z-index: 99999;
 }
 
@@ -166,8 +166,30 @@ th {
     margin-top: 25px;
 }
 
+.nav-tabs {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
 .nav-link {
     color: #fff;
+}
+
+.nav-tabs .nav-item {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+
+.nav-tabs .nav-link {
+    padding: 8px 15px;
+    border-radius: 5px;
+    background:#212529;
 }
 
 .nav-item.show .nav-link {
@@ -303,6 +325,7 @@ th {
     border-radius: 3px;
     color: #fff !important;
     margin-bottom: 15px;
+    background: #212529;
 }
 
 .button .oi {
@@ -349,4 +372,16 @@ th {
     background-color: #343a40;
     color: #fff;
     position: relative;
+}
+
+#content .page-element-overview {
+    width: auto;
+    height: 100vh;
+    overflow: hidden;
+    float: left;
+}
+
+#content .page-content {
+    position: relative;
+    float: left;
 }

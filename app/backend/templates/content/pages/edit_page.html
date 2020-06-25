@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block editor %}
-    <div class="col-lg-4">
+    <div class="col-lg-4 page-content">
         {% if form %}
             {{ form_helper.render_form(form) }}
         {% endif %}
     </div>
-    <div class="col-lg-4">
+    <div class="col-lg-4 page-element-overview">
         {% for page_element in page_elements %}
         {% endfor %}
     </div>

@@ -260,9 +260,6 @@ class CustomForm(FlaskForm):
                     elif self.is_element_submit(element_id):
                         submit = self.get_element_html(element)
 
-                if tab == "content" and self.module == "pages":
-                    html_tab[tab] += self.get_page_element_overview_html()
-
                 html += '<div id="tab-{0}" data-tab-id="{1}" class="tab container-fluid">'.format(tab, tab)
                 html += html_tab[tab]
                 html += "</div>"
