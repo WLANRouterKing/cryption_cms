@@ -1438,7 +1438,10 @@ class Page(Database):
         """
         pages = self.get_top_level_pages()
         url = "backend." + self.edit_node
-        html = '<ul class="page-tree sortable">'
+        html = '<div class="pages-overview-list">';
+        # todo translate header
+        html += '<div class="pages-overview-header"><span>Seitenübersicht</span></div>'
+        html += '<ul class="page-tree sortable">'
 
         for page in pages:
 
@@ -1482,6 +1485,7 @@ class Page(Database):
             html += '</a>'
             html += '</li>'
         html += '</ul>'
+        html += '</div>'
         return html
 
 

@@ -81,7 +81,7 @@ th {
     width: auto;
     height: auto;
     overflow: hidden;
-    padding: 4px;
+    padding: 10px;
     text-align: left;
     color: #212529;
     height: 35px;
@@ -189,7 +189,7 @@ th {
 .nav-tabs .nav-link {
     padding: 8px 15px;
     border-radius: 5px;
-    background:#212529;
+    background: #212529;
 }
 
 .nav-item.show .nav-link {
@@ -214,8 +214,33 @@ th {
     margin-bottom: 10px;
 }
 
+.form-check {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.form-check input[type="checkbox"],
+.form-check label {
+    align-self: center;
+}
+
+.form-check input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    display: block;
+    content: "";
+    float: left;
+    margin: 0;
+    margin-right: 5px;
+    align-self: center;
+}
+
 .fileupload-container {
     padding: 15px;
+    border: 1px solid #212529;
 }
 
 .fileupload-container .info,
@@ -228,11 +253,23 @@ th {
     margin-top: 20px;
 }
 
+.dz-preview img {
+    max-width: 90px;
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
 .dz-message {
     text-align: center;
     cursor: pointer;
     margin-top: 20px;
     margin-bottom: 20px;
+    background: #212529;
+    color: #fff;
+    border-radius: 5px;
+    float: none;
+    width: 100%;
 }
 
 .dz-message span {
@@ -332,6 +369,14 @@ th {
     margin-right: 20px;
 }
 
+.pages-overview-header {
+    width: 100%;
+    background: #212529;
+    color: #fff;
+    line-height: 40px;
+    padding-left: 10px;
+}
+
 .page-tree {
     position: relative;
     height: auto;
@@ -342,10 +387,13 @@ th {
     position: relative;
     height: auto;
     overflow: hidden;
+    background: #ccc;
+    padding-left: 10px;
 }
 
 .page-tree .page-item .page-link {
     line-height: 40px;
+    color: #212529;
 }
 
 .page-tree .page-item .edit,

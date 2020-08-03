@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block account_edit %}
-    <div class="col-lg-4">
+    <div class="form-container">
         <form id="register-form" method="post" action="{{ url_for('backend.account_edit') }}">
             {{ form_helper.render_form(form) }}
         </form>

@@ -7,5 +7,5 @@ PAGE_ELEMENTS = {}
 PAGE_ELEMENTS["text"] = {
     "label": "Text",
     "info": "",
-    "user": [],
+    "users": [],
 }
