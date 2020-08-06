@@ -44,11 +44,11 @@ class CustomForm(FlaskForm):
         elements = self.get_all_elements()
         for key in elements:
             if key == "id":
-                self.id = int(object.get(key))
+                self.id = object.get(key)
             element = elements[key]
             value = object.get(key)
             element.data = value
-            
+
     @property
     def action(self):
         page = "{0}.{1}".format(self.blueprint_name, self.page)
@@ -99,7 +99,7 @@ class CustomForm(FlaskForm):
         max_images = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["max_files"]
         max_size = current_app.config["IMAGE_FORMATS"][self.module][element.label.field_id]["max_size"]
         return "Bilder im Format {0}x{1} | max. Anzahl: {2} | max. Größe: {3} MB".format(width, height, str(max_images),
-                                                                                   str(max_size))
+                                                                                         str(max_size))
 
     def get_document_upload_info(self, element):
         return "Dokumente"
@@ -229,9 +229,10 @@ class CustomForm(FlaskForm):
         html = ""
         if form_object is not None:
             self.init_values(form_object)
-        html = '<form id="{0}" method="{1}" cellspacing="0" action="{2}" enctype="multipart/form-data">'.format(self.form_id,
-                                                                                                self.method,
-                                                                                                self.action)
+        html = '<form id="{0}" method="{1}" cellspacing="0" action="{2}" enctype="multipart/form-data">'.format(
+            self.form_id,
+            self.method,
+            self.action)
 
         html += '<input type="hidden" id="type" name="type" value="{0}">'.format(self.type)
         html += '<input type="hidden" id="module" name="module" value="{0}">'.format(self.module)

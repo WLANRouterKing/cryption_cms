@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
 {% block editor %}
+
+    <div class="overview-controls">
+        <a href="{{ url_for("backend.add_page") }}" class="add-new">{{ pages.class_label }} hinzufügen</a>
+    </div>
+
     {% if pages %}
         {{ pages.get_page_tree()|safe }}
     {% endif %}

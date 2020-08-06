@@ -407,6 +407,7 @@ class Database:
             int: Den Integer Wert für den Schlüssel insofern dieser Konvertiert werden kannn ansonsten 0
         """
         string = self.get(key)
+
         if string != "":
             integer = int(string)
             return integer
@@ -432,7 +433,7 @@ class Database:
 
     def init_default(self):
         for column in self.get_columns():
-            if column != "id" and search("ctrl", column) is None:
+            if column != "id" and column != "parent_id" and search("ctrl", column) is None:
                 self.set(column, "")
 
     def get_connection(self):
@@ -1182,7 +1183,7 @@ class Page(Database):
         return self.get("label")
 
     def get_parent_id(self):
-        return int(self.get("parent_id"))
+        return self.get_as_int("parent_id")
 
     def get_intro_text(self):
         return self.get("introtext")

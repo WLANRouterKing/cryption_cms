@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
 {% block editor %}
+
+    <div class="overview-controls">
+        <a href="{{ url_for("backend.add_news") }}" class="add-new">{{ news.class_label }} hinzufügen</a>
+    </div>
+
     {% if news %}
         {{ news.get_list_html()|safe }}
     {% endif %}

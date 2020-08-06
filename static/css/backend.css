@@ -433,3 +433,20 @@ th {
     position: relative;
     float: left;
 }
+
+.overview-controls {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: hidden;
+    padding: 15px;
+    padding-left: 0;
+}
+
+.add-new {
+    padding: 8px 15px;
+    border-radius: 5px;
+    background: #212529;
+    cursor: pointer;
+    color: #fff;
+}
