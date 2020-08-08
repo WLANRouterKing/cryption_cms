@@ -184,7 +184,7 @@ def account_edit():
     be_user = BeUser()
     be_user.set_id(user_id)
     be_user.load()
-    form = EditAccountForm(request.form)
+    form = EditAccountForm()
     if request.method == "GET":
         form.init_values(be_user)
     if request.method == "POST":
@@ -197,6 +197,7 @@ def account_edit():
                 flash("Sie haben ein falsches Passwort eingegeben", "danger")
         else:
             form.get_error_messages()
+
     return render_template("account/edit_account.html", form=form)
 
 

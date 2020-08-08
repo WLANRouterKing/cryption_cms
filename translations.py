@@ -32,4 +32,9 @@ COLUMN_LABELS = {
     "user_agent": {"DE": "User Agent", "EN": "User Agent"},
     "item_id": {"DE": "Item ID", "EN": "Item ID"},
     "item_table": {"DE": "Tabelle", "EN": "Table"},
+    "subject": {"DE": "Betreff", "EN": "Subject"},
+    "receiver": {"DE": "Empfänger", "EN": "Receiver"},
+    "sender": {"DE": "Absender", "EN": "Sender"},
+    "message": {"DE": "Nachricht", "EN": "Message"},
+    "time": {"DE": "Zeitpunkt", "EN": "Time"},
 }
