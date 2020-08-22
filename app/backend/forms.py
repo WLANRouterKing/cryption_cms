@@ -99,7 +99,7 @@ class Texteditor(TextAreaField):
 
 class NewsEditorForm(CustomForm):
     id = HiddenField()
-    eid = StringField("EID")
+    eid = HiddenField("EID")
     eid_custom = StringField("Custom EID")
     title = StringField("Titel", validators=[DataRequired()])
     intro_text = Texteditor("Intro Text", validators=[Length(max=145)])

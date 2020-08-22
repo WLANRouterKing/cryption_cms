@@ -34,6 +34,21 @@
     {% endblock %}
 </head>
 <body>
+
+<div id="status-bar">
+    {% block status_bar %}
+        <div class="container-fluid">
+            {% if current_user %}
+                {% if current_user.is_authenticated %}
+                    <span>Eingeloggt als {{ current_user.username }}</span>
+                    <span>Letzter Login {{ current_user.last_login }}</span>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endblock %}
+    <a id="logout-link" href="{{ url_for("backend.logout") }}"></a>
+</div>
+
 <div id="header">
     {% block navigation %}
         <div id="main-navigation">
@@ -50,7 +65,7 @@
                         {% if item.items %}
                             <ul class="nav2">
                                 {% for child in item.items %}
-                                    <li class="{{ 'active' if child.is_active else '' }} nav-item nav2-item {{ 'dropdown-submenu dropright' if child.items else '' }}">
+                                    <li class="nav-item nav2-item {{ 'active' if child.is_active else '' }} {{ 'dropdown-submenu dropright' if child.items else '' }}">
                                         {% if child.items %}
                                             <a class="nav-link nav2-link {{ 'active' if child.is_active else '' }} {{ child.html_attrs if child.html_attrs else '' }}"
                                                href="#">{{ child.label }}</a>
@@ -79,20 +94,6 @@
     {% endblock %}
     {% block header %}
     {% endblock %}
-</div>
-
-<div id="status-bar">
-    {% block status_bar %}
-        <div class="container-fluid">
-            {% if current_user %}
-                {% if current_user.is_authenticated %}
-                    <span>Eingeloggt als {{ current_user.username }}</span>
-                    <span>Letzter Login {{ current_user.last_login }}</span>
-                {% endif %}
-            {% endif %}
-        </div>
-    {% endblock %}
-    <a id="logout-link" href="{{ url_for("backend.logout") }}"></a>
 </div>
 
 {% block flashed_messages %}

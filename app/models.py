@@ -498,7 +498,7 @@ class Database:
             rows = cursor.fetchall()
             for row in rows:
                 if row[0]:
-                    list.append(row[0])
+                    id_list.append(row[0])
         except Exception as error:
             debug_logger.log(10, error)
         finally:
@@ -595,13 +595,13 @@ class Database:
             for key in columns:
                 values.append(self.get(key))
             values.append(id)
-            print(values)
             sql = """UPDATE {0} SET {1} WHERE id = %s """.format(table, update_string)
-            print(sql)
             cursor.execute(sql, values)
             connection.commit()
             rowcount = cursor.rowcount
-
+            print(values)
+            print(sql)
+            print(rowcount)
             if rowcount > 0:
                 success = True
 
@@ -657,7 +657,7 @@ class Database:
                       "success")
 
         except Exception as error:
-            debug_logger.log(10, error)
+            debug_logger.debug(error)
         finally:
             self.close_connection(cursor)
 

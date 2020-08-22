@@ -445,15 +445,15 @@ def edit_news(id):
         news.set_id(id)
         news.load()
 
-    if request.method == "GET":
-        form.init_values(news)
-
     if request.method == "POST":
         if form.validate_on_submit():
             news.prepare_form_input(request.form)
             news.save()
+            news.load()
         else:
             form.get_error_messages()
+
+    form.init_values(news)
     return render_template("content/news/edit_news.html", form=form)
 
 
@@ -527,15 +527,15 @@ def edit_page(id):
         page.load()
         page_elements = page_element.get_list_for_page(page.get_id())
 
-    if request.method == "GET":
-        form.init_values(page)
-
     if request.method == "POST":
         if form.validate_on_submit():
             page.prepare_form_input(request.form)
             page.save()
+            page.load()
         else:
             form.get_error_messages()
+
+    form.init_values(page)
 
     return render_template("content/pages/edit_page.html", form=form, page_elements=page_elements)
 
@@ -582,6 +582,7 @@ def edit_page_element(id):
     form = page_element_module.page_element_editor_form
     form.id = id
     form.eid = eid
+
     if request.method == "GET":
         form.init_values(page_element)
 
