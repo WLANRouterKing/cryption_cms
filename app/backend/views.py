@@ -502,6 +502,8 @@ def add_page():
     form = PageEditorForm()
     page = Page()
     page.init_default()
+    page.set("ctrl_template", "standard")
+    page.set("ctrl_index", 1)
     page.save()
 
     return render_template("content/pages/add_page.html", form=form, form_object=page)

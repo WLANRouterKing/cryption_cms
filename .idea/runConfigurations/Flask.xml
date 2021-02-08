@@ -10,7 +10,7 @@
     <envs>
       <env name="FLASK_APP" value="main.py" />
     </envs>
-    <option name="SDK_HOME" value="$PROJECT_DIR$/../untitled/venv/bin/python" />
+    <option name="SDK_HOME" value="/usr/bin/python3.8" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />

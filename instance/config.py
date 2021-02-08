@@ -5,9 +5,6 @@ MAIL_ADMIN = "contact@alexweese.de"
 # mysql connector
 ############################################################################
 DATABASE_HOST = "127.0.0.1"
-# DATABASE_NAME = "cryption_cms"
-# DATABASE_USER = "cryption_cms"
-# DATABASE_PASSWORD = "Dng@vO95hD7avauz"
 DATABASE_NAME = "cryption_cms"
 DATABASE_USER = "phpmyadmin"
 DATABASE_PASSWORD = "root"

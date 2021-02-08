@@ -14,6 +14,7 @@ body {
     max-width: 100%;
     margin: 0 auto;
     overflow: hidden;
+    height: 100%;
 }
 
 ul {
@@ -105,6 +106,14 @@ th {
     clear: both;
 }
 
+#page-canvas {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    height: 100%;
+}
+
 #header,
 #aside,
 #content,
@@ -118,18 +127,21 @@ th {
     max-width: 220px;
     width: 100%;
     position: relative;
-    min-height: 100vh;
     height: auto;
     overflow: hidden;
     float: left;
     background: #212529;
     color: #fff;
-    padding-top: 56px;
     border-right: 1px solid #212529;
+    min-height: 100vh;
+    flex-basis: 220px;
+    align-self: flex-start;
+    justify-self: flex-start;
+    margin-right: 50px;
 }
 
 #status-bar {
-    max-width: calc(100% - 220px);
+    max-width: 100%;
     height: auto;
     padding: 15px;
     border-bottom: 1px solid #212529;
@@ -137,6 +149,8 @@ th {
     width: 100%;
     background: #212529;
     color: #fff;
+    flex-basis: 100%;
+    align-self: flex-start;
 }
 
 #status-bar span {
@@ -144,13 +158,14 @@ th {
 }
 
 #content {
-    max-width: calc(100% - 220px);
-    height: 100vh;
+    min-height: 100vh;
+    overflow: auto;
+    flex-basis: calc(100% - 280px);
+    width: 100%;
     padding-top: 50px;
-    float: left;
-    overflow: hidden;
-    padding-left: 50px;
-    overflow-y: scroll;
+    height: 100%;
+    box-sizing: border-box;
+    padding-left: 0;
 }
 
 #content .col-lg-4 {

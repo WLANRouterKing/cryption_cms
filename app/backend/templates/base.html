@@ -10,15 +10,24 @@
     <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static', filename='favicon/apple-icon-60x60.png') }}">
     <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='favicon/apple-icon-72x72.png') }}">
     <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='favicon/apple-icon-76x76.png') }}">
-    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='favicon/apple-icon-114x114.png') }}">
-    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='favicon/apple-icon-120x120.png') }}">
-    <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='favicon/apple-icon-144x144.png') }}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='favicon/apple-icon-152x152.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon/apple-icon-180x180.png') }}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='favicon/android-icon-192x192.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon/favicon-96x96.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114"
+          href="{{ url_for('static', filename='favicon/apple-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120"
+          href="{{ url_for('static', filename='favicon/apple-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144"
+          href="{{ url_for('static', filename='favicon/apple-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152"
+          href="{{ url_for('static', filename='favicon/apple-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180"
+          href="{{ url_for('static', filename='favicon/apple-icon-180x180.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192"
+          href="{{ url_for('static', filename='favicon/android-icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32"
+          href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96"
+          href="{{ url_for('static', filename='favicon/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16"
+          href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='favicon/manifest.json') }}">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="{{ url_for('static', filename='favicon/ms-icon-144x144.png') }}">
@@ -35,106 +44,108 @@
 </head>
 <body>
 
-<div id="status-bar">
-    {% block status_bar %}
-        <div class="container-fluid">
-            {% if current_user %}
-                {% if current_user.is_authenticated %}
-                    <span>Eingeloggt als {{ current_user.username }}</span>
-                    <span>Letzter Login {{ current_user.last_login }}</span>
+<div id="page-canvas">
+    <div id="status-bar">
+        {% block status_bar %}
+            <div class="container-fluid">
+                {% if current_user %}
+                    {% if current_user.is_authenticated %}
+                        <span>Eingeloggt als {{ current_user.username }}</span>
+                        <span>Letzter Login {{ current_user.last_login }}</span>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </div>
-    {% endblock %}
-    <a id="logout-link" href="{{ url_for("backend.logout") }}"></a>
-</div>
-
-<div id="header">
-    {% block navigation %}
-        <div id="main-navigation">
-            <ul class="nav">
-                {% for item in nav.main %}
-                    <li class="{{ 'active' if item.is_active else '' }} nav-item  nav1-item {{ '' if item.items else '' }}">
-                        {% if item.items %}
-                            <span class="nav1-label {{ item.html_attrs }}">{{ item.label }}</span>
-                        {% else %}
-                            <a class="nav-link nav1-link {{ 'active' if item.is_active else '' }} {{ item.html_attrs }}"
-                               href="{{ item.url }}">{{ item.label }}</a>
-                        {% endif %}
-
-                        {% if item.items %}
-                            <ul class="nav2">
-                                {% for child in item.items %}
-                                    <li class="nav-item nav2-item {{ 'active' if child.is_active else '' }} {{ 'dropdown-submenu dropright' if child.items else '' }}">
-                                        {% if child.items %}
-                                            <a class="nav-link nav2-link {{ 'active' if child.is_active else '' }} {{ child.html_attrs if child.html_attrs else '' }}"
-                                               href="#">{{ child.label }}</a>
-                                        {% else %}
-                                            <a class="nav-link nav2-link {{ 'active' if child.is_active else '' }} {{ child.html_attrs if child.html_attrs else '' }}"
-                                               href="{{ child.url }}">{{ child.label }}</a>
-                                        {% endif %}
-                                        {% if child.items %}
-                                            <ul class="nav3">
-                                                {% for child in child.items %}
-                                                    <li class="{{ 'active' if child.is_active else '' }} nav-item  nav3-item {{ '' if child.items else '' }}">
-                                                        <a class="nav-link nav3-link {{ 'active' if child.is_active else '' }} {{ child.html_attrs if child.html_attrs else '' }}"
-                                                           href="{{ child.url }}">{{ child.label }}</a>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endblock %}
-    {% block header %}
-    {% endblock %}
-</div>
-
-{% block flashed_messages %}
-    <div class="container-fluid">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+            </div>
+        {% endblock %}
+        <a id="logout-link" href="{{ url_for("backend.logout") }}"></a>
     </div>
-{% endblock %}
 
-<div id="content">
-    {% block content %}
+    <div id="header">
+        {% block navigation %}
+            <div id="main-navigation">
+                <ul class="nav">
+                    {% for item in nav.main %}
+                        <li class="{{ 'active' if item.is_active else '' }} nav-item  nav1-item {{ '' if item.items else '' }}">
+                            {% if item.items %}
+                                <span class="nav1-label {{ item.html_attrs }}">{{ item.label }}</span>
+                            {% else %}
+                                <a class="nav-link nav1-link {{ 'active' if item.is_active else '' }} {{ item.html_attrs }}"
+                                   href="{{ item.url }}">{{ item.label }}</a>
+                            {% endif %}
+
+                            {% if item.items %}
+                                <ul class="nav2">
+                                    {% for child in item.items %}
+                                        <li class="nav-item nav2-item {{ 'active' if child.is_active else '' }} {{ 'dropdown-submenu dropright' if child.items else '' }}">
+                                            {% if child.items %}
+                                                <a class="nav-link nav2-link {{ 'active' if child.is_active else '' }} {{ child.html_attrs if child.html_attrs else '' }}"
+                                                   href="#">{{ child.label }}</a>
+                                            {% else %}
+                                                <a class="nav-link nav2-link {{ 'active' if child.is_active else '' }} {{ child.html_attrs if child.html_attrs else '' }}"
+                                                   href="{{ child.url }}">{{ child.label }}</a>
+                                            {% endif %}
+                                            {% if child.items %}
+                                                <ul class="nav3">
+                                                    {% for child in child.items %}
+                                                        <li class="{{ 'active' if child.is_active else '' }} nav-item  nav3-item {{ '' if child.items else '' }}">
+                                                            <a class="nav-link nav3-link {{ 'active' if child.is_active else '' }} {{ child.html_attrs if child.html_attrs else '' }}"
+                                                               href="{{ child.url }}">{{ child.label }}</a>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endblock %}
+        {% block header %}
+        {% endblock %}
+    </div>
+
+    {% block flashed_messages %}
         <div class="container-fluid">
-            {% block editor %}
-            {% endblock %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
         </div>
     {% endblock %}
-</div>
 
-
-{% block footer %}
-    <div id="footer">
-
+    <div id="content">
+        {% block content %}
+            <div class="container-fluid">
+                {% block editor %}
+                {% endblock %}
+            </div>
+        {% endblock %}
     </div>
-{% endblock %}
 
-<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
-{% block footer_script_start %}
-{% endblock %}
+    {% block footer %}
+        <div id="footer">
 
-<script src="{{ url_for('static', filename='js/dropzone.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/ckeditor.js') }}"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        </div>
+    {% endblock %}
 
-{% block footer_script_end %}
-{% endblock %}
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
+    {% block footer_script_start %}
+    {% endblock %}
+
+    <script src="{{ url_for('static', filename='js/dropzone.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ckeditor.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    {% block footer_script_end %}
+    {% endblock %}
+
+</div>
 </body>
 </html>
